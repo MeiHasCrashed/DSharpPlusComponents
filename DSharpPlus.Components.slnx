@@ -1,2 +1,4 @@
 <Solution>
+  <Project Path="src\DSharpPlus.Components.Example\DSharpPlus.Components.Example.csproj" Type="Classic C#" />
+  <Project Path="src\DSharpPlus.Components\DSharpPlus.Components.csproj" Type="Classic C#" />
 </Solution>
