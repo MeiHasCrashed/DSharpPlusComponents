@@ -9,7 +9,12 @@
 
     <ItemGroup>
       <PackageReference Include="DSharpPlus" Version="5.0.0-nightly-02556" />
+      <PackageReference Include="DSharpPlus.Commands" Version="5.0.0-nightly-02556" />
       <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.10" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\DSharpPlus.Components\DSharpPlus.Components.csproj" />
     </ItemGroup>
 
 </Project>
