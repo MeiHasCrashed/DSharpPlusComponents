@@ -1,0 +1,5 @@
+﻿* text=auto
+
+# Disable diff for yarn releases and plugins
+/.yarn/releases/** binary
+/.yarn/plugins/** binary
