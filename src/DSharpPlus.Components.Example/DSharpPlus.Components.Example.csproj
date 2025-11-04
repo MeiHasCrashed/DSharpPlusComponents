@@ -7,4 +7,9 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="DSharpPlus" Version="5.0.0-nightly-02556" />
+      <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.10" />
+    </ItemGroup>
+
 </Project>
