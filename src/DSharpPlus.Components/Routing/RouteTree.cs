@@ -1,6 +1,6 @@
 ﻿namespace DSharpPlus.Components.Routing;
 
-public class RouteTree<T>(char separator) where T : class
+public class RouteTree<T>(char separator = '-') where T : class
 {
     private readonly RouteNode<T> _root = new() { Name = "*"};
 
