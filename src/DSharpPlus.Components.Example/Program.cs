@@ -21,7 +21,10 @@ builder.Logging
 
 builder.Services
     .AddDiscordClient(token, DiscordIntents.AllUnprivileged | DiscordIntents.MessageContents)
-    .AddComponentsExtension()
+    .AddComponentsExtension(components =>
+    {
+        components.AddComponents(Assembly.GetAssembly(typeof(BotService))!);
+    })
     .AddCommandsExtension((_, commands) =>
     {
         commands.AddCommands(Assembly.GetAssembly(typeof(BotService))!);
