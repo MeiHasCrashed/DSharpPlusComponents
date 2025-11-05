@@ -192,4 +192,39 @@ public class RouteTreeTests
         Assert.Throws<ArgumentNullException>(() => routeTree.Match(null!));
         Assert.Throws<ArgumentNullException>(() => routeTree.Insert(null!, "value"));
     }
+
+    [Fact]
+    public void TestRouteTreeBacktrack()
+    {
+        var routeTree = new RouteTree<string>('-');
+        routeTree.Insert("button-test-*", "value17");
+        routeTree.Insert("button-test-12345-34as", "value18");
+        
+        var result1 = routeTree.Match("button-test-12345-34as");
+        Assert.True(result1.IsMatch);
+        Assert.Equal("value18", result1.Value);
+        Assert.Empty(result1.Wildcards);
+        
+        var result2 = routeTree.Match("button-test-12345");
+        Assert.True(result2.IsMatch);
+        Assert.Equal("value17", result2.Value);
+        Assert.Single(result2.Wildcards);
+        Assert.Equal("12345", result2.Wildcards[0]);
+    }
+
+    [Fact]
+    public void TestRouteTreeEmptySegments()
+    {
+        var routeTree = new RouteTree<string>('-');
+        routeTree.Insert("a--b-c", "value19");
+        var result = routeTree.Match("a--b-c");
+        Assert.True(result.IsMatch);
+        Assert.Equal("value19", result.Value);
+        Assert.Empty(result.Wildcards);
+        
+        var result2 = routeTree.Match("a-b-c");
+        Assert.True(result2.IsMatch);
+        Assert.Equal("value19", result2.Value);
+        Assert.Empty(result2.Wildcards);
+    }
 }

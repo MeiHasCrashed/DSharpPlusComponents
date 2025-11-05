@@ -24,4 +24,13 @@ public class TestCommands
             .AsEphemeral();
         await ctx.Interaction.CreateResponseAsync(DiscordInteractionResponseType.ChannelMessageWithSource, builder);
     }
+
+    [ComponentInteraction("button-test-12345-34as")]
+    public async Task SpecificButtonTestHandler(ComponentContext ctx)
+    {
+        var builder = new DiscordInteractionResponseBuilder()
+            .WithContent("Specific button clicked!")
+            .AsEphemeral();
+        await ctx.Interaction.CreateResponseAsync(DiscordInteractionResponseType.ChannelMessageWithSource, builder);
+    }
 }

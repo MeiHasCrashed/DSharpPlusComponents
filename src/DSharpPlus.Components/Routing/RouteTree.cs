@@ -6,14 +6,9 @@ public class RouteTree<T>(char separator = '-') where T : class
 
     public void Insert(string path, T value)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(path);
-        // If the path starts with a separator, remove it, since the root node represents the starting point.
-        if(path[0] == separator)
-            path = path[1..];
-        var split = path.Split(separator);
-        
+        var segments = SegmentPath(path);
         var currentNode = _root;
-        foreach (var item in split)
+        foreach (var item in segments)
         {
             if (!currentNode.Children.TryGetValue(item, out var childNode))
             {
@@ -28,18 +23,29 @@ public class RouteTree<T>(char separator = '-') where T : class
     
     public RouteResult<T> Match(string path)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(path);
-        if(path[0] == separator)
-            path = path[1..];
-        var split = path.Split(separator);
+        var segments = SegmentPath(path);
         
         var currentNode = _root;
         List<string> wildcards = [];
-        foreach (var item in split)
+        RouteNode<T>? backtrackNode = null;
+        List<string> backtrackWildcards = [];
+        foreach (var item in segments)
         {
+            if (currentNode.Children.TryGetValue("*", out var maybeBacktrackNode) && maybeBacktrackNode is
+                    { Value: not null, Children.Count: 0 })
+            {
+                backtrackNode = maybeBacktrackNode;
+                backtrackWildcards.Clear();
+                backtrackWildcards.AddRange(wildcards);
+            }
+            
             if (currentNode.Children.TryGetValue(item, out var childNode))
             {
                 currentNode = childNode;
+                if (backtrackNode is not null)
+                {
+                    backtrackWildcards.Add(item);
+                }
             }
             else if (currentNode.Children.TryGetValue("*", out var wildcardNode))
             {
@@ -56,13 +62,29 @@ public class RouteTree<T>(char separator = '-') where T : class
             }
         }
 
-        if (currentNode.Value is null)
+        if (currentNode.Value is null && backtrackNode is null)
         {
             return new  RouteResult<T> { IsMatch = false, Value = null, Wildcards = [] };
         }
+
+        if (currentNode.Value is not null)
+        {
+            return new RouteResult<T>{ IsMatch = true, Value = currentNode.Value, Wildcards = wildcards };    
+        }
+        return new RouteResult<T>{ IsMatch = true, Value = backtrackNode!.Value, Wildcards = backtrackWildcards };
         
-        return new RouteResult<T>{ IsMatch = true, Value = currentNode.Value, Wildcards = wildcards };
     }
     
     public RouteNode<T> GetRoot() => _root;
+
+    private string[] SegmentPath(string path)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(path);
+        // If the path starts with a separator, remove it, since the root node represents the starting point.
+        if(path[0] == separator)
+            path = path[1..];
+        if(path[^1] == separator)
+            path = path[..^1];
+        return path.Split(separator, StringSplitOptions.RemoveEmptyEntries);
+    }
 }
