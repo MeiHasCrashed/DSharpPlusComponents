@@ -227,4 +227,12 @@ public class RouteTreeTests
         Assert.Equal("value19", result2.Value);
         Assert.Empty(result2.Wildcards);
     }
+    
+    [Fact]
+    public void TestRouteTreeDuplicateInsert()
+    {
+        var routeTree = new RouteTree<string>('-');
+        routeTree.Insert("a-b-c", "value20");
+        Assert.Throws<InvalidOperationException>(() => routeTree.Insert("a-b-c", "value21"));
+    }
 }

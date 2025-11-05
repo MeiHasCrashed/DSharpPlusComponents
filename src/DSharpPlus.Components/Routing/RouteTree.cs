@@ -23,6 +23,11 @@ public class RouteTree<T>(char separator = '-') where T : class
                 currentNode = childNode;
             }
 
+            if (currentNode.Value is not null)
+            {
+                throw new InvalidOperationException($"A value is already registered for the path '{path}'.");
+            }
+
             currentNode.Value = value;
         }
         finally
