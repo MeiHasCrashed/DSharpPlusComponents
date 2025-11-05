@@ -25,7 +25,7 @@ public class RouteTree<T>(char separator) where T : class
         currentNode.Value = value;
     }
     
-    public RouteResult<T> Search(string path)
+    public RouteResult<T> Match(string path)
     {
         if(path[0] == separator)
             path = path[1..];
