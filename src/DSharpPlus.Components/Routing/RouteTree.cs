@@ -25,7 +25,7 @@ public class RouteTree<T>(char separator) where T : class
         currentNode.Value = value;
     }
     
-    public (T? Value, List<string> Wildcards) Search(string path)
+    public RouteResult<T> Search(string path)
     {
         if(path[0] == separator)
             path = path[1..];
@@ -46,11 +46,11 @@ public class RouteTree<T>(char separator) where T : class
             }
             else
             {
-                return (null, []);
+                return new RouteResult<T> { IsMatch = false, Value = null, Wildcards = [] };
             }
         }
-
-        return (currentNode.Value, wildcards);
+        
+        return new RouteResult<T>{ IsMatch = true, Value = currentNode.Value, Wildcards = wildcards };
     }
     
     public RouteNode<T> GetRoot() => _root;

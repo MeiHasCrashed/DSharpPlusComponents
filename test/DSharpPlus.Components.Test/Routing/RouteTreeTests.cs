@@ -21,9 +21,10 @@ public class RouteTreeTests
         var routeTree = new RouteTree<string>('-');
         routeTree.Insert("a-b-c", "value1");
         
-        var (value, wildcards) = routeTree.Search("a-b-c");
-        Assert.Equal("value1", value);
-        Assert.Empty(wildcards);
+        var result = routeTree.Search("a-b-c");
+        Assert.True(result.IsMatch);
+        Assert.Equal("value1", result.Value);
+        Assert.Empty(result.Wildcards);
     }
 
     [Fact]
@@ -32,10 +33,11 @@ public class RouteTreeTests
         var routeTree = new RouteTree<string>('-');
         routeTree.Insert("a-*-c", "value2");
         
-        var (value, wildcards) = routeTree.Search("a-b-c");
-        Assert.Equal("value2", value);
-        Assert.Single(wildcards);
-        Assert.Equal("b", wildcards[0]);
+        var result = routeTree.Search("a-b-c");
+        Assert.True(result.IsMatch);
+        Assert.Equal("value2", result.Value);
+        Assert.Single(result.Wildcards);
+        Assert.Equal("b", result.Wildcards[0]);
     }
 
     [Fact]
@@ -43,9 +45,10 @@ public class RouteTreeTests
     {
         var routeTree = new RouteTree<string>('-');
         routeTree.Insert("a-b-c", "value3");
-        var (value, wildcards) = routeTree.Search("a-x-c");
-        Assert.Null(value);
-        Assert.Empty(wildcards);
+        var result = routeTree.Search("a-x-c");
+        Assert.False(result.IsMatch);
+        Assert.Null(result.Value);
+        Assert.Empty(result.Wildcards);
     }
 
     [Fact]
@@ -53,11 +56,12 @@ public class RouteTreeTests
     {
         var routeTree = new RouteTree<string>('-');
         routeTree.Insert("a-*-*-d", "value4");
-        var (value, wildcards) = routeTree.Search("a-b-c-d");
-        Assert.Equal("value4", value);
-        Assert.Equal(2, wildcards.Count);
-        Assert.Equal("b", wildcards[0]);
-        Assert.Equal("c", wildcards[1]);
+        var result = routeTree.Search("a-b-c-d");
+        Assert.True(result.IsMatch);
+        Assert.Equal("value4", result.Value);
+        Assert.Equal(2, result.Wildcards.Count);
+        Assert.Equal("b", result.Wildcards[0]);
+        Assert.Equal("c", result.Wildcards[1]);
     }
 
     [Fact]
@@ -65,9 +69,10 @@ public class RouteTreeTests
     {
         var routeTree = new RouteTree<string>('-');
         routeTree.Insert("a-*-*-d", "value5");
-        var (value, wildcards) = routeTree.Search("a-b-c-e");
-        Assert.Null(value);
-        Assert.Empty(wildcards);
+        var result = routeTree.Search("a-b-c-e");
+        Assert.False(result.IsMatch);
+        Assert.Null(result.Value);
+        Assert.Empty(result.Wildcards);
     }
     
     [Fact]
@@ -77,14 +82,16 @@ public class RouteTreeTests
         routeTree.Insert("a-b-c", "value7");
         routeTree.Insert("a-*-c", "value6");
         
-        var (value1, wildcards1) = routeTree.Search("a-b-c");
-        Assert.Equal("value7", value1);
-        Assert.Empty(wildcards1);
+        var result1 = routeTree.Search("a-b-c");
+        Assert.True(result1.IsMatch);
+        Assert.Equal("value7", result1.Value);
+        Assert.Empty(result1.Wildcards);
         
-        var (value2, wildcards2) = routeTree.Search("a-x-c");
-        Assert.Equal("value6", value2);
-        Assert.Single(wildcards2);
-        Assert.Equal("x", wildcards2[0]);
+        var result2 = routeTree.Search("a-x-c");
+        Assert.True(result2.IsMatch);
+        Assert.Equal("value6", result2.Value);
+        Assert.Single(result2.Wildcards);
+        Assert.Equal("x", result2.Wildcards[0]);
     }
 
     [Fact]
@@ -94,10 +101,11 @@ public class RouteTreeTests
         routeTree.Insert("a-*-c", "value8");
         routeTree.Insert("a-*-*", "value9");
         
-        var (value1, wildcards1) = routeTree.Search("a-b-c");
-        Assert.Equal("value8", value1);
-        Assert.Single(wildcards1);
-        Assert.Equal("b", wildcards1[0]);
+        var result = routeTree.Search("a-b-c");
+        Assert.True(result.IsMatch);
+        Assert.Equal("value8", result.Value);
+        Assert.Single(result.Wildcards);
+        Assert.Equal("b", result.Wildcards[0]);
     }
 
     [Fact]
@@ -105,9 +113,10 @@ public class RouteTreeTests
     {
         var routeTree = new RouteTree<string>('-');
         routeTree.Insert("-a-b-c", "value10");
-        var (value, wildcards) = routeTree.Search("-a-b-c");
-        Assert.Equal("value10", value);
-        Assert.Empty(wildcards);
+        var result = routeTree.Search("-a-b-c");
+        Assert.True(result.IsMatch);
+        Assert.Equal("value10", result.Value);
+        Assert.Empty(result.Wildcards);
     }
     
     [Fact]
@@ -119,21 +128,25 @@ public class RouteTreeTests
         routeTree.Insert("a-b", "value13");
         routeTree.Insert("a-*-e", "value14");
         
-        var (value1, wildcards1) = routeTree.Search("a-b-c");
-        Assert.Equal("value11", value1);
-        Assert.Empty(wildcards1);
+        var result1 = routeTree.Search("a-b-c");
+        Assert.True(result1.IsMatch);
+        Assert.Equal("value11", result1.Value);
+        Assert.Empty(result1.Wildcards);
         
-        var (value2, wildcards2) = routeTree.Search("a-b-d");
-        Assert.Equal("value12", value2);
-        Assert.Empty(wildcards2);
+        var result2 = routeTree.Search("a-b-d");
+        Assert.True(result2.IsMatch);
+        Assert.Equal("value12", result2.Value);
+        Assert.Empty(result2.Wildcards);
         
-        var (value3, wildcards3) = routeTree.Search("a-b");
-        Assert.Equal("value13", value3);
-        Assert.Empty(wildcards3);
+        var result3 = routeTree.Search("a-b");
+        Assert.True(result3.IsMatch);
+        Assert.Equal("value13", result3.Value);
+        Assert.Empty(result3.Wildcards);
         
-        var (value4, wildcards4) = routeTree.Search("a-x-e");;
-        Assert.Equal("value14", value4);
-        Assert.Single(wildcards4);
-        Assert.Equal("x", wildcards4[0]);
+        var result4 = routeTree.Search("a-x-e");
+        Assert.True(result4.IsMatch);
+        Assert.Equal("value14", result4.Value);
+        Assert.Single(result4.Wildcards);
+        Assert.Equal("x", result4.Wildcards[0]);
     }
 }
