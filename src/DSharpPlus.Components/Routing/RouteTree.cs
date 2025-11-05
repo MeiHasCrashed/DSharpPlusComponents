@@ -2,77 +2,96 @@
 
 public class RouteTree<T>(char separator = '-') where T : class
 {
+    private readonly ReaderWriterLockSlim _lock = new();
     private readonly RouteNode<T> _root = new() { Name = "*"};
 
     public void Insert(string path, T value)
     {
-        var segments = SegmentPath(path);
-        var currentNode = _root;
-        foreach (var item in segments)
+        try
         {
-            if (!currentNode.Children.TryGetValue(item, out var childNode))
+            _lock.EnterWriteLock();
+            var segments = SegmentPath(path);
+            var currentNode = _root;
+            foreach (var item in segments)
             {
-                childNode = new RouteNode<T> { Name = item };
-                currentNode.Children[item] = childNode;
+                if (!currentNode.Children.TryGetValue(item, out var childNode))
+                {
+                    childNode = new RouteNode<T> { Name = item };
+                    currentNode.Children[item] = childNode;
+                }
+
+                currentNode = childNode;
             }
 
-            currentNode = childNode;
+            currentNode.Value = value;
         }
-        currentNode.Value = value;
+        finally
+        {
+            _lock.ExitWriteLock();
+        }
     }
     
     public RouteResult<T> Match(string path)
     {
-        var segments = SegmentPath(path);
-        
-        var currentNode = _root;
-        List<string> wildcards = [];
-        RouteNode<T>? backtrackNode = null;
-        List<string> backtrackWildcards = [];
-        foreach (var item in segments)
+        try
         {
-            if (currentNode.Children.TryGetValue("*", out var maybeBacktrackNode) && maybeBacktrackNode is
-                    { Value: not null, Children.Count: 0 })
+            _lock.EnterReadLock();
+            var segments = SegmentPath(path);
+
+            var currentNode = _root;
+            List<string> wildcards = [];
+            RouteNode<T>? backtrackNode = null;
+            List<string> backtrackWildcards = [];
+            foreach (var item in segments)
             {
-                backtrackNode = maybeBacktrackNode;
-                backtrackWildcards.Clear();
-                backtrackWildcards.AddRange(wildcards);
-            }
-            
-            if (currentNode.Children.TryGetValue(item, out var childNode))
-            {
-                currentNode = childNode;
-                if (backtrackNode is not null)
+                if (currentNode.Children.TryGetValue("*", out var maybeBacktrackNode) && maybeBacktrackNode is
+                        { Value: not null, Children.Count: 0 })
                 {
-                    backtrackWildcards.Add(item);
+                    backtrackNode = maybeBacktrackNode;
+                    backtrackWildcards.Clear();
+                    backtrackWildcards.AddRange(wildcards);
+                }
+
+                if (currentNode.Children.TryGetValue(item, out var childNode))
+                {
+                    currentNode = childNode;
+                    if (backtrackNode is not null)
+                    {
+                        backtrackWildcards.Add(item);
+                    }
+                }
+                else if (currentNode.Children.TryGetValue("*", out var wildcardNode))
+                {
+                    currentNode = wildcardNode;
+                    wildcards.Add(item);
+                }
+                else if (currentNode is { IsWildcard: true, Children.Count: 0 })
+                {
+                    wildcards.Add(item);
+                }
+                else
+                {
+                    return new RouteResult<T> { IsMatch = false, Value = null, Wildcards = [] };
                 }
             }
-            else if (currentNode.Children.TryGetValue("*", out var wildcardNode))
-            {
-                currentNode = wildcardNode;
-                wildcards.Add(item);
-            }
-            else if (currentNode is { IsWildcard: true, Children.Count: 0 })
-            {
-                wildcards.Add(item);
-            }
-            else
+
+            if (currentNode.Value is null && backtrackNode is null)
             {
                 return new RouteResult<T> { IsMatch = false, Value = null, Wildcards = [] };
             }
-        }
 
-        if (currentNode.Value is null && backtrackNode is null)
-        {
-            return new  RouteResult<T> { IsMatch = false, Value = null, Wildcards = [] };
-        }
+            if (currentNode.Value is not null)
+            {
+                return new RouteResult<T> { IsMatch = true, Value = currentNode.Value, Wildcards = wildcards };
+            }
 
-        if (currentNode.Value is not null)
-        {
-            return new RouteResult<T>{ IsMatch = true, Value = currentNode.Value, Wildcards = wildcards };    
+            return new RouteResult<T> { IsMatch = true, Value = backtrackNode!.Value, Wildcards = backtrackWildcards };
+
         }
-        return new RouteResult<T>{ IsMatch = true, Value = backtrackNode!.Value, Wildcards = backtrackWildcards };
-        
+        finally
+        {
+            _lock.ExitReadLock();
+        }
     }
     
     public RouteNode<T> GetRoot() => _root;
