@@ -4,7 +4,7 @@ public class RouteTree<T>(char separator = '-') where T : class
 {
     private readonly ReaderWriterLockSlim _lock = new();
     private readonly RouteNode<T> _root = new() { Name = "*"};
-    private int _routeCount = 0;
+    private int _routeCount;
 
     public void Insert(string path, T value)
     {
