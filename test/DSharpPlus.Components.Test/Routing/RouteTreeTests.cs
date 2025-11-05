@@ -12,7 +12,13 @@ public class RouteTreeTests
         var tree = routeTree.GetRoot();
         Assert.NotNull(tree);
         Assert.Equal("*", tree.Name);
+        Assert.Null(tree.Value);
         Assert.Empty(tree.Children);
+        
+        var result = routeTree.Match("a-b-c");
+        Assert.False(result.IsMatch);
+        Assert.Null(result.Value);
+        Assert.Empty(result.Wildcards);
     }
 
     [Fact]
@@ -148,5 +154,42 @@ public class RouteTreeTests
         Assert.Equal("value14", result4.Value);
         Assert.Single(result4.Wildcards);
         Assert.Equal("x", result4.Wildcards[0]);
+    }
+
+    [Fact]
+    public void TestRouteTreeCatchAll()
+    {
+        var routeTree = new RouteTree<string>('-');
+        routeTree.Insert("a-b-*", "value15");
+        routeTree.Insert("a-b-d", "value16");
+        
+        var result1 = routeTree.Match("a-b-c");
+        Assert.True(result1.IsMatch);
+        Assert.Equal("value15", result1.Value);
+        Assert.Single(result1.Wildcards);
+        Assert.Equal("c", result1.Wildcards[0]);
+        
+        var result2 = routeTree.Match("a-b-d");
+        Assert.True(result2.IsMatch);
+        Assert.Equal("value16", result2.Value);
+        Assert.Empty(result2.Wildcards);
+
+        var result3 = routeTree.Match("a-b-fge-1234");
+        Assert.True(result3.IsMatch);
+        Assert.Equal("value15", result3.Value);
+        Assert.Equal(2, result3.Wildcards.Count);
+        Assert.Equal("fge", result3.Wildcards[0]);
+        Assert.Equal("1234", result3.Wildcards[1]);
+    }
+
+    [Fact]
+    public void TestRouteTreeEmptyPath()
+    {
+        var routeTree = new RouteTree<string>('-');
+        Assert.Throws<ArgumentException>(() => routeTree.Insert("", "value"));
+        Assert.Throws<ArgumentException>(() => routeTree.Match(""));
+
+        Assert.Throws<ArgumentNullException>(() => routeTree.Match(null!));
+        Assert.Throws<ArgumentNullException>(() => routeTree.Insert(null!, "value"));
     }
 }

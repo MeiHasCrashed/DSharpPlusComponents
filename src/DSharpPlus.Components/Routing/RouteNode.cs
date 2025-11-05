@@ -6,4 +6,6 @@ public class RouteNode<T> where T : class
     public Dictionary<string, RouteNode<T>> Children { get; init; } = [];
     
     public T? Value { get; set; }
+    
+    public bool IsWildcard => Name == "*";
 }

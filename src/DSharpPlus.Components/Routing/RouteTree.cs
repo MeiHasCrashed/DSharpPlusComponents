@@ -6,6 +6,7 @@ public class RouteTree<T>(char separator = '-') where T : class
 
     public void Insert(string path, T value)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(path);
         // If the path starts with a separator, remove it, since the root node represents the starting point.
         if(path[0] == separator)
             path = path[1..];
@@ -27,6 +28,7 @@ public class RouteTree<T>(char separator = '-') where T : class
     
     public RouteResult<T> Match(string path)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(path);
         if(path[0] == separator)
             path = path[1..];
         var split = path.Split(separator);
@@ -44,10 +46,19 @@ public class RouteTree<T>(char separator = '-') where T : class
                 currentNode = wildcardNode;
                 wildcards.Add(item);
             }
+            else if (currentNode is { IsWildcard: true, Children.Count: 0 })
+            {
+                wildcards.Add(item);
+            }
             else
             {
                 return new RouteResult<T> { IsMatch = false, Value = null, Wildcards = [] };
             }
+        }
+
+        if (currentNode.Value is null)
+        {
+            return new  RouteResult<T> { IsMatch = false, Value = null, Wildcards = [] };
         }
         
         return new RouteResult<T>{ IsMatch = true, Value = currentNode.Value, Wildcards = wildcards };

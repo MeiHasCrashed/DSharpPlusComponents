@@ -11,7 +11,7 @@ public class ComponentRoute
     private readonly MethodInfo _methodInfo;
     private readonly Type _declaringType;
     private readonly bool _canBeInstantiated;
-    private readonly bool _isValueTask;
+    private readonly int _wildcardParameterCount;
 
     private ComponentRoute(string routeId, MethodInfo methodInfo)
     {
@@ -19,6 +19,7 @@ public class ComponentRoute
         _methodInfo = methodInfo;
         _declaringType = methodInfo.DeclaringType ?? throw new InvalidOperationException("Method must have a declaring type.");
         _canBeInstantiated = !_declaringType.IsAbstract || !_declaringType.IsSealed;
+        _wildcardParameterCount = methodInfo.GetParameters().Length - 1; // Exclude ComponentContext
     }
 
     public async Task ExecuteAsync(ComponentContext context, List<string> wildcardValues)
@@ -30,6 +31,13 @@ public class ComponentRoute
         }
 
         var values = wildcardValues.ToArray();
+        if (values.Length > _wildcardParameterCount)
+        {
+            var directWildcards = values.AsSpan(0, _wildcardParameterCount - 1);
+            var remainingWildcards = values.AsSpan(_wildcardParameterCount - 1);
+            var joined = string.Join('-', remainingWildcards!);
+            values = [..directWildcards, joined];
+        }
         var maybeTask = _methodInfo.Invoke(commandObject, [context, ..values]);
         switch (maybeTask)
         {
@@ -57,8 +65,11 @@ public class ComponentRoute
         if (parameters.Length == 0 || parameters[0].ParameterType != typeof(ComponentContext))
             throw new InvalidOperationException("First parameter must be of type ComponentContext.");
         
-        if(attribute.CustomId.Count(c => c == '*') != parameters.Length - 1)
-            throw new InvalidOperationException("Number of wildcards must match number of parameters after ComponentContext.");
+        var wildcards = attribute.CustomId.Count(c => c == '*');
+        if(wildcards > 0 && parameters.Length < 2)
+            throw new InvalidOperationException("At least one parameter must be present after ComponentContext when using wildcards.");
+        if(wildcards > parameters.Length - 1)
+            throw new InvalidOperationException("Number of parameters must at least match number of wildcards.");
 
         return new ComponentRoute(attribute.CustomId, methodInfo);
     }
