@@ -4,6 +4,7 @@ public class RouteTree<T>(char separator = '-') where T : class
 {
     private readonly ReaderWriterLockSlim _lock = new();
     private readonly RouteNode<T> _root = new() { Name = "*"};
+    private int _routeCount = 0;
 
     public void Insert(string path, T value)
     {
@@ -29,6 +30,7 @@ public class RouteTree<T>(char separator = '-') where T : class
             }
 
             currentNode.Value = value;
+            _routeCount++;
         }
         finally
         {
@@ -100,6 +102,22 @@ public class RouteTree<T>(char separator = '-') where T : class
     }
     
     public RouteNode<T> GetRoot() => _root;
+
+    public int Count
+    {
+        get
+        {
+            try
+            {
+                _lock.EnterReadLock();
+                return _routeCount;
+            }
+            finally
+            {
+                _lock.ExitReadLock();
+            }
+        }
+    }
 
     private string[] SegmentPath(string path)
     {

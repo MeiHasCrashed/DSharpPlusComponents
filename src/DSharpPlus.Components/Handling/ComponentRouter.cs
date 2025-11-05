@@ -40,4 +40,6 @@ public class ComponentRouter(ILogger<ComponentRouter> logger, IServiceProvider s
             logger.LogError(ex, "Error executing component route for interaction ID: {InteractionId}", args.Id);
         }
     }
+    
+    internal int RouteCount => _routes.Count;
 }

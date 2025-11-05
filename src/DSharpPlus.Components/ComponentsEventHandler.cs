@@ -11,6 +11,6 @@ internal sealed class ComponentsEventHandler(ILogger<ComponentsEventHandler> log
     public async Task HandleEventAsync(DiscordClient sender, ComponentInteractionCreatedEventArgs eventArgs)
     {
         logger.LogDebug("Received component interaction: {InteractionId} from user {UserTag}", eventArgs.Id, eventArgs.User.Username);
-        await extension.HandleInteractionAsync(eventArgs);
+        await extension.Router.HandleInteractionAsync(eventArgs);
     }
 }
