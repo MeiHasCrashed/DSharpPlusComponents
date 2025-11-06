@@ -29,7 +29,7 @@ dotnet package add MeiHasCrashed.DSharpPlus.Components
 ## Usage
 
 > [!TIP]
-> You can find a full example project in `src/DSharpPlus.Components.Example`
+> You can find a full example project in `src/DSharpPlus.Components.Example`.
 
 You first need to register the component system in your service collection and configure it:
 
