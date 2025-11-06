@@ -1,30 +1,30 @@
 ﻿using DSharpPlus.Components.Context;
-using DSharpPlus.Components.Routing;
 using DSharpPlus.EventArgs;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace DSharpPlus.Components.Dispatch;
 
-public class ComponentRouter(ILogger<ComponentRouter> logger, IServiceProvider serviceProvider) : BaseRouter<ComponentRoute, ComponentContext>(logger)
+public class ModalRouter(ILogger<ModalRouter> logger, IServiceProvider serviceProvider) : BaseRouter<ModalRoute, ModalContext>(logger)
 {
-    public async Task HandleInteractionAsync(ComponentInteractionCreatedEventArgs args)
+    public async Task HandleInteractionAsync(ModalSubmittedEventArgs args)
     {
         var path = args.Id;
         var matchResult = Routes.Match(path);
         if (!matchResult.IsMatch)
         {
-            logger.LogDebug("No route matched for component interaction with ID: {InteractionId}", args.Id);
+            logger.LogDebug("No route matched for modal interaction with ID: {InteractionId}", args.Id);
             return;
         }
         await using var scope = serviceProvider.CreateAsyncScope();
         var route = matchResult.Value!;
-        var context = new ComponentContext
+        var context = new ModalContext
         {
             ServiceScope = scope,
-            Channel = args.Channel,
+            Channel = args.Interaction.Channel,
             Interaction = args.Interaction,
-            User = args.User
+            User = args.Interaction.User,
+            Values = args.Values
         };
         await ExecuteAsync(route, context, matchResult.Wildcards);
     }

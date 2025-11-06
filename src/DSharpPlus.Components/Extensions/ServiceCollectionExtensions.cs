@@ -15,6 +15,7 @@ public static class ServiceCollectionExtensions
                 b.AddEventHandlers<ComponentLoaderEventHandler>(ServiceLifetime.Singleton);
             })
             .AddSingleton<ComponentRouter>()
+            .AddSingleton<ModalRouter>()
             .AddSingleton(provider =>
             {
                 var extension = ActivatorUtilities.CreateInstance<ComponentsExtension>(provider);

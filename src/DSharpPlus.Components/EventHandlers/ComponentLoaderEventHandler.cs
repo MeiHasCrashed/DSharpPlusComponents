@@ -9,7 +9,7 @@ public class ComponentLoaderEventHandler(ILogger<ComponentLoaderEventHandler> lo
 {
     public Task HandleEventAsync(DiscordClient sender, ClientStartedEventArgs eventArgs)
     {
-        logger.LogDebug("Loaded {} component interaction routes.", components.Router.RouteCount);
+        logger.LogDebug("Loaded {} component interaction routes.", components.ComponentRouter.RouteCount);
         return Task.CompletedTask;
     }
 }

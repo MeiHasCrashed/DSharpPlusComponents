@@ -1,9 +1,9 @@
 ﻿using DSharpPlus.Entities;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DSharpPlus.Components;
+namespace DSharpPlus.Components.Context;
 
-public class ComponentContext
+public class InteractionBaseContext
 {
     public required IServiceScope ServiceScope { get; init; }
     

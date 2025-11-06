@@ -1,56 +1,12 @@
 ﻿using System.Reflection;
 using DSharpPlus.Components.Attributes;
-using Microsoft.Extensions.DependencyInjection;
+using DSharpPlus.Components.Context;
 
 namespace DSharpPlus.Components.Dispatch;
 
-public class ComponentRoute
+public class ComponentRoute : BaseRoute<ComponentContext>
 {
-    public string RouteId { get; init; }
-
-    private readonly MethodInfo _methodInfo;
-    private readonly Type _declaringType;
-    private readonly bool _canBeInstantiated;
-    private readonly int _wildcardParameterCount;
-
-    private ComponentRoute(string routeId, MethodInfo methodInfo)
-    {
-        RouteId = routeId;
-        _methodInfo = methodInfo;
-        _declaringType = methodInfo.DeclaringType ?? throw new InvalidOperationException("Method must have a declaring type.");
-        _canBeInstantiated = !_declaringType.IsAbstract || !_declaringType.IsSealed;
-        _wildcardParameterCount = methodInfo.GetParameters().Length - 1; // Exclude ComponentContext
-    }
-
-    public async Task ExecuteAsync(ComponentContext context, List<string> wildcardValues)
-    {
-        object? commandObject = null;
-        if (_canBeInstantiated)
-        {
-            commandObject = ActivatorUtilities.CreateInstance(context.ServiceScope.ServiceProvider, _declaringType);
-        }
-
-        var values = wildcardValues.ToArray();
-        if (values.Length > _wildcardParameterCount)
-        {
-            var directWildcards = values.AsSpan(0, _wildcardParameterCount - 1);
-            var remainingWildcards = values.AsSpan(_wildcardParameterCount - 1);
-            var joined = string.Join('-', remainingWildcards!);
-            values = [..directWildcards, joined];
-        }
-        var maybeTask = _methodInfo.Invoke(commandObject, [context, ..values]);
-        switch (maybeTask)
-        {
-            case Task task:
-                await task;
-                break;
-            case ValueTask valueTask:
-                await valueTask;
-                break;
-            default:
-                throw new InvalidOperationException("Method did not return Task or ValueTask.");
-        }
-    }
+    private ComponentRoute(string routeId, MethodInfo methodInfo) : base(routeId, methodInfo) { }
 
     public static ComponentRoute FromMethodInfo(MethodInfo methodInfo)
     {

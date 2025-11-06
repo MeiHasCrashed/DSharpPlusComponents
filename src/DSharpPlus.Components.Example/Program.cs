@@ -23,7 +23,7 @@ builder.Services
     .AddDiscordClient(token, DiscordIntents.AllUnprivileged | DiscordIntents.MessageContents)
     .AddComponentsExtension(components =>
     {
-        components.AddComponents(Assembly.GetAssembly(typeof(BotService))!);
+        components.AddInteractions(Assembly.GetAssembly(typeof(BotService))!);
     })
     .AddCommandsExtension((_, commands) =>
     {
