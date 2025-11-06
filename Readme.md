@@ -4,7 +4,7 @@ This library provides a simple component system for DSharpPlus,
 inspired by Discord.Net's Interaction implementation.
 
 > [!CAUTION]
-> Currently this is only intended for me to use, but if anyone else finds it useful, feel free to use it.\
+> Currently this is primarily intended for me to use, but if anyone else finds it useful, feel free to use it.\
 > However I make no guarantees about stability or support. Things might get removed or changed without warning.
 
 
@@ -18,6 +18,13 @@ You can install the library via NuGet:
 ```
 Install-Package MeiHasCrashed.DSharpPlus.Components
 ```
+Or via the .NET CLI:
+```
+dotnet package add MeiHasCrashed.DSharpPlus.Components
+```
+
+> [!IMPORTANT]
+> You will need at least DSharpPlus version 5.0.0 or higher to use this library (Nightly).
 
 ## Usage
 You first need to register the component system in your service collection and configure it:
@@ -35,7 +42,7 @@ Then, you can declare your component handlers using attributes:
 
 > [!NOTE]
 > Component Handlers have no specific requirements for their containing class.\
-> Additionally they either be in normal classes or static classes.\
+> Additionally, they can either be in normal classes or static classes.\
 > Normal classes will get resolved from the service provider the extension is registered on.
 
 ### Message Components
