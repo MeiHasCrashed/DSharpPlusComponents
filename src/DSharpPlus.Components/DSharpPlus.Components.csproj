@@ -4,6 +4,16 @@
         <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <AssemblyName>MeiHasCrashed.DSharpPlus.Components</AssemblyName>
+        <PackageId>MeiHasCrashed.DSharpPlus.Components</PackageId>
+        <Version>0.0.1</Version>
+        <Authors>MeiHasCrashed</Authors>
+        <Description>This library provides a simple component system for DSharpPlus, inspired by Discord.Net's Interaction implementation.</Description>
+        <Copyright>Copyright (c) MeiHasCrashed 2025</Copyright>
+        <PackageProjectUrl>https://github.com/MeiHasCrashed/DSharpPlusComponents</PackageProjectUrl>
+        <PackageTags>DSharpPlus, Discord, Components</PackageTags>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageReadmeFile>Readme.md</PackageReadmeFile>
     </PropertyGroup>
 
     <ItemGroup>
