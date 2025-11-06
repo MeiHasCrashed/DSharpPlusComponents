@@ -23,4 +23,8 @@
       <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.10" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Include="Readme.md" Pack="true" PackagePath="" />
+    </ItemGroup>
+
 </Project>

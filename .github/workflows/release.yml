@@ -1,0 +1,37 @@
+﻿name: Release
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+env:
+  PROJECT_PATH: ${{ github.workspace }}/src/DSharpPlus.Components/DSharpPlus.Components.csproj
+  PACKAGE_OUTPUT: ${{ github.workspace }}/output
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 9.x
+      
+      - name: Restore dependencies
+        run: dotnet restore
+      
+      - name: Build project
+        run: dotnet build --no-restore --configuration Release
+      
+      - name: Test project
+        run: dotnet test --no-build --configuration Release
+      
+      - name: Pack project
+        run: dotnet pack ${{ env.PROJECT_PATH }} --no-restore --no-build --configuration Release --include-symbols --output ${{ env.PACKAGE_OUTPUT }}
+      
+      - name: Push to Nuget
+        run: dotnet nuget push ${{ env.PACKAGE_OUTPUT }}/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_KEY }}
