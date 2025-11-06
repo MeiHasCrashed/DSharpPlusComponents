@@ -8,6 +8,10 @@ env:
   PROJECT_PATH: ${{ github.workspace }}/src/DSharpPlus.Components/DSharpPlus.Components.csproj
   PACKAGE_OUTPUT: ${{ github.workspace }}/output
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
