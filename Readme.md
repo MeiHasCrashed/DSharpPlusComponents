@@ -24,7 +24,7 @@ dotnet package add MeiHasCrashed.DSharpPlus.Components
 ```
 
 > [!IMPORTANT]
-> You will need at least DSharpPlus version 5.0.0 or higher to use this library (Nightly).
+> You will need at least DSharpPlus version 5.0.0 or higher to use this library (currently DSharpPlus Nightly).
 
 ## Usage
 
