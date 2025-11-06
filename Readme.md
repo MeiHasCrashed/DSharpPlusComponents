@@ -1,4 +1,4 @@
-﻿# Mei.DSharpPlus.Components
+﻿# MeiHasCrashed.DSharpPlus.Components
 
 This library provides a simple component system for DSharpPlus, 
 inspired by Discord.Net's Interaction implementation.
@@ -27,6 +27,10 @@ dotnet package add MeiHasCrashed.DSharpPlus.Components
 > You will need at least DSharpPlus version 5.0.0 or higher to use this library (Nightly).
 
 ## Usage
+
+> [!TIP]
+> You can find a full example project in `src/DSharpPlus.Components.Example`
+
 You first need to register the component system in your service collection and configure it:
 
 ```csharp
