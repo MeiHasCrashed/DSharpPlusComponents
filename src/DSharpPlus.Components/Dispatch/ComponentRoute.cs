@@ -2,7 +2,7 @@
 using DSharpPlus.Components.Attributes;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DSharpPlus.Components.Handling;
+namespace DSharpPlus.Components.Dispatch;
 
 public class ComponentRoute
 {

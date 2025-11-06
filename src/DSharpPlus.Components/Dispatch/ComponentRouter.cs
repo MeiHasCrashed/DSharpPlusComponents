@@ -3,7 +3,7 @@ using DSharpPlus.EventArgs;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace DSharpPlus.Components.Handling;
+namespace DSharpPlus.Components.Dispatch;
 
 public class ComponentRouter(ILogger<ComponentRouter> logger, IServiceProvider serviceProvider)
 {

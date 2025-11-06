@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 using DSharpPlus.Components.Attributes;
-using DSharpPlus.Components.Handling;
+using DSharpPlus.Components.Dispatch;
 using DSharpPlus.Components.Util;
 using DSharpPlus.EventArgs;
 using Microsoft.Extensions.Logging;

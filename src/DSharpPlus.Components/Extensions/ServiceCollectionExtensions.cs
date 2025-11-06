@@ -1,4 +1,4 @@
-﻿using DSharpPlus.Components.Handling;
+﻿using DSharpPlus.Components.Dispatch;
 using DSharpPlus.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
