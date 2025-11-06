@@ -59,5 +59,6 @@ public class TestCommands
     {
         await ctx.Interaction.CreateResponseAsync(DiscordInteractionResponseType.ChannelMessageWithSource,
             new DiscordInteractionResponseBuilder().WithContent("Thank you!").AsEphemeral());
+        throw new Exception("Test exception from modal handler");
     }
 }

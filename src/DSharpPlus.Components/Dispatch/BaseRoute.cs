@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using DSharpPlus.Components.Attributes;
 using DSharpPlus.Components.Context;
+using DSharpPlus.Components.IL;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DSharpPlus.Components.Dispatch;
@@ -13,6 +14,7 @@ public class BaseRoute<TContext> where TContext : InteractionBaseContext
     private readonly Type _declaringType;
     private readonly bool _canBeInstantiated;
     private readonly int _wildcardParameterCount;
+    private readonly InvocationGenerator.InvokeHandlerDelegate _invokeWrapper;
 
     protected BaseRoute(string routeId, MethodInfo methodInfo)
     {
@@ -21,6 +23,7 @@ public class BaseRoute<TContext> where TContext : InteractionBaseContext
         _declaringType = methodInfo.DeclaringType ?? throw new InvalidOperationException("Method must have a declaring type.");
         _canBeInstantiated = !_declaringType.IsAbstract || !_declaringType.IsSealed;
         _wildcardParameterCount = methodInfo.GetParameters().Length - 1; // Exclude ComponentContext
+        _invokeWrapper = InvocationGenerator.GenerateDelegate(methodInfo);
     }
 
     public async Task ExecuteAsync(TContext context, List<string> wildcardValues)
@@ -39,17 +42,7 @@ public class BaseRoute<TContext> where TContext : InteractionBaseContext
             var joined = string.Join('-', remainingWildcards!);
             values = [..directWildcards, joined];
         }
-        var maybeTask = _methodInfo.Invoke(commandObject, [context, ..values]);
-        switch (maybeTask)
-        {
-            case Task task:
-                await task;
-                break;
-            case ValueTask valueTask:
-                await valueTask;
-                break;
-            default:
-                throw new InvalidOperationException("Method did not return Task or ValueTask.");
-        }
+
+        await _invokeWrapper(commandObject, [context, ..values]);
     }
 }
