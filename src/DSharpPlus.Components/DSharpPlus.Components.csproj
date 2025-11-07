@@ -4,6 +4,8 @@
         <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <AssemblyName>MeiHasCrashed.DSharpPlus.Components</AssemblyName>
         <PackageId>MeiHasCrashed.DSharpPlus.Components</PackageId>
         <Version>0.0.1</Version>
